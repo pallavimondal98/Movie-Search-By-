@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import {
     KeyboardArrowDown,
-    // KeyboardArrowUp,
-    FilterAltOutlined
+    FilterAltOutlined,
+    KeyboardArrowUp
 
 } from '@mui/icons-material';
 import MovieCard from '../Components/MovieCard';
@@ -28,6 +28,7 @@ const MOVIES_PER_PAGE = 3; // Number of movies per page
 const Home = () => {
 
     const [movies, setMovies] = useState([]);
+    const [isOpen, setIsOpen] = useState(false);
     const [selectedLanguages, setSelectedLanguages] = useState([]);
     const [selectedCountries, setSelectedCountries] = useState([]);
     const [selectedGenres, setSelectedGenres] = useState([]);
@@ -59,18 +60,19 @@ const Home = () => {
 
     const handleCountryChange = (event) => {
         const { value, checked } = event.target;
-        setSelectedCountries(prev => 
+        setSelectedCountries(prev =>
             checked ? [...prev, value] : prev.filter(country => country !== value)
         );
     };
 
     const handleGenreChange = (event) => {
         const { value, checked } = event.target;
-        setSelectedGenres(prev => 
+        setSelectedGenres(prev =>
             checked ? [...prev, value] : prev.filter(genre => genre !== value)
         );
     };
 
+    const toggleOpen = () => setIsOpen(!isOpen);
 
     // Calculate the slice of movies to display
     const indexOfLastMovie = currentPage * MOVIES_PER_PAGE;
@@ -79,20 +81,13 @@ const Home = () => {
 
     return (
         <div>
-            <div className=' grid mx-32 p-3 cursor-pointer h-auto'>
-                <div className=' flex w-full gap-12'>
-                    <div className=' bg-[#fcbc58] w-[21rem] p-2 rounded-xl flex justify-between'>
+            <div className='flex flex-col sm:flex-row   mx-4 md:mx-32 p-3 cursor-pointer h-auto'>
+                <div className=' mr-4'>
+                    <div className=' bg-[#fcbc58] w-[21rem] p-2 rounded-xl flex justify-between' onClick={toggleOpen}>
                         <span><FilterAltOutlined />Filter</span>
-                        <KeyboardArrowDown />
+                        {isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
                     </div>
-                    <div className='w-full flex gap-8'>
-                        <input placeholder='Type here...' className=' bg-[#353535] w-[35rem]  p-2 rounded-xl' />
-                        <button className=' bg-[#353535] w-44  p-2 rounded-xl'>Search</button>
-                    </div>
-                </div>
-
-                <div className='flex gap-4'>
-                    <div className='bg-[#353535] w-[21rem] p-2 mt-6 rounded-xl h-auto'>
+                    {isOpen && (<div className='bg-[#353535] w-full md:w-[21rem] p-2 mt-6 rounded-xl h-auto'>
                         <div className=' mb-3'>
                             <div className='flex justify-between'>
                                 <h1 className=' font-medium text-[#fcbc58]'>Language</h1>
@@ -101,7 +96,7 @@ const Home = () => {
                             <div className='overflow-y-scroll h-48'>
                                 {language.map((lang, index) => (
                                     <div key={index} className=' flex gap-3'>
-                                        <input type='checkbox' className='accent-[#fcbc58]'  id={`language${index}`} name={`language${index}`} value={lang} onChange={handleLanguageChange} checked={selectedLanguages.includes(lang)} />
+                                        <input type='checkbox' className='accent-[#fcbc58]' id={`language${index}`} name={`language${index}`} value={lang} onChange={handleLanguageChange} checked={selectedLanguages.includes(lang)} />
                                         <label htmlFor={`language${index}`}>{lang}</label>
                                     </div>
                                 ))}
@@ -135,14 +130,21 @@ const Home = () => {
                                 ))}
                             </div>
                         </div>
+                    </div>)} 
+                </div>
+
+                <div className=' mt-8 sm:mt-0 gap-4'>
+                    <div className='w-full flex flex-col sm:flex-row gap-4'>
+                        <input placeholder='Type here...' className=' bg-[#353535] w-full  p-2 rounded-xl' />
+                        <button className=' bg-[#353535] w-full sm:w-44  p-2 rounded-xl'>Search</button>
                     </div>
-                    <div className='grid'>
-                        <div className='mt-6'>
-                        {filteredMovies.slice(indexOfFirstMovie, indexOfLastMovie).map((movie, index) => (
+                    <div className='grid w-full'>
+                        <div className='mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-1 gap-4'>
+                            {filteredMovies.slice(indexOfFirstMovie, indexOfLastMovie).map((movie, index) => (
                                 <MovieCard key={index} movie={movie} />
                             ))}
                         </div>
-                        <Stack spacing={2}>
+                        <Stack spacing={2} className=' w-[22rem] lg:w-full flex justify-center mt-4'>
                             <Pagination
                                 className='bg-transparent'
                                 style={{
